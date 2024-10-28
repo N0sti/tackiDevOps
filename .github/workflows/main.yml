@@ -13,7 +13,7 @@ jobs:
           java-version: '17'
           distribution: 'corretto'
 
-      # Step to build and test the application with Maven and run SonarCloud analysis
+      # Steps to build and test the application with Maven and run SonarCloud analysis
       - name: Build and test with Maven
         run: mvn -B verify sonar:sonar \
           -Dsonar.projectKey=devops-2024 \
