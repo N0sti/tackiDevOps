@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '17'
-          distribution: 'temurin'  # Specify the Java distribution
+          distribution: 'corretto'  # Specify the Java distribution
 
       # Step to build and test the application with Maven
       - name: Build and test with Maven
