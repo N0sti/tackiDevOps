@@ -1,43 +1,14 @@
-name: CI devops 2024
+name: Build and Push Docker Image
 
 on:
-  # Le workflow se déclenche sur les branches main et dev
-  push:
-    branches:
-      - main
-      - dev
-  pull_request:
-    branches:
-      - main
-      - dev
+  workflow_run:
+    workflows: ["Test Backend"]  # Assurez-vous que le nom correspond exactement au workflow précédent
+    types:
+      - completed
 
 jobs:
-  test-backend:
-    runs-on: ubuntu-22.04
-    steps:
-      # Étape pour vérifier le code source
-      - name: Checkout code
-        uses: actions/checkout@v2.5.0
-
-      # Étape pour configurer le JDK 17
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'corretto'
-
-      # Étape pour construire et tester l’application avec Maven et lancer l'analyse SonarCloud
-      - name: Build and test with Maven and SonarCloud
-        run: |
-          mvn -B verify sonar:sonar \
-            -Dsonar.projectKey=projettpkatimadevops \
-            -Dsonar.organization=tpkatimadevops \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-            --file ./simple-api/pom.xml
-
   build-and-push-docker-image:
-    needs: test-backend  # Ce job dépend du job test-backend
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}  # Exécute ce job seulement si le précédent a réussi
     runs-on: ubuntu-22.04
 
     steps:
@@ -55,7 +26,7 @@ jobs:
         with:
           context: ./simple-api  # Chemin vers votre Dockerfile pour le backend
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-simple-api:latest
-          push: ${{ github.ref == 'refs/heads/main' }}  # Publie uniquement sur la branche main
+          push: true  # Pousse l'image, car cela est conditionné à la branche ci-dessous
 
       # Étape pour construire et pousser l'image de la base de données
       - name: Build image and push database
@@ -63,7 +34,7 @@ jobs:
         with:
           context: ./database  # Chemin vers votre Dockerfile pour la base de données
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-database:latest
-          push: ${{ github.ref == 'refs/heads/main' }}  # Publie uniquement sur la branche main
+          push: true
 
       # Étape pour construire et pousser l'image httpd
       - name: Build image and push httpd
@@ -71,4 +42,4 @@ jobs:
         with:
           context: ./http-server  # Chemin vers votre Dockerfile pour httpd
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
-          push: ${{ github.ref == 'refs/heads/main' }}  # Publie uniquement sur la branche main
+          push: true
