@@ -1,0 +1,36 @@
+name: Test Backend
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+  pull_request:
+    branches:
+      - develop
+      - master
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-22.04
+    steps:
+      # Étape pour vérifier le code source
+      - name: Checkout code
+        uses: actions/checkout@v2.5.0
+
+      # Étape pour configurer le JDK 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+
+      # Étape pour construire et tester l’application avec Maven et lancer l'analyse SonarCloud
+      - name: Build and test with Maven and SonarCloud
+        run: |
+          mvn -B verify sonar:sonar \
+            -Dsonar.projectKey=projettpkatimadevops \
+            -Dsonar.organization=tpkatimadevops \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+            --file ./simple-api/pom.xml
