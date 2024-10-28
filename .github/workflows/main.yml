@@ -1,0 +1,31 @@
+name: CI devops 2024
+
+on:
+  # Le workflow se déclenche sur les branches main et develop
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-22.04
+    steps:
+      # Étape pour vérifier le code source
+      - name: Checkout code
+        uses: actions/checkout@v2.5.0
+
+      # Étape pour configurer le JDK 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+
+      # Étape pour construire et tester l’application avec Maven
+      - name: Build and test with Maven
+        run: mvn clean verify --file ./simple-api/pom.xml
