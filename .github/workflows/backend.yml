@@ -25,7 +25,7 @@ jobs:
           java-version: '17'
           distribution: 'corretto'
 
-      # Étape pour construire et tester l’application avec Maven et lancer l'analyse SonarCloud
+      # Étape pour construire et tester l’application avec Maven et lancer l'analyse SonarCloud.
       - name: Build and test with Maven and SonarCloud
         run: |
           mvn -B verify sonar:sonar \
